@@ -13,6 +13,7 @@ if(isset($_POST['submit'])){
   addStudent($fname,$lname,$roll);
 };
 if(isset($_POST['submit']) && $task == 'update'){
+  $id = $_POST['id'];
   $fname = $_POST['fname'];
   $lname = $_POST['lname'];
   $roll = $_POST['roll'];
@@ -90,13 +91,19 @@ endif;
 ?>
 <?php
 if('update' == $task):
-  $student_id = $_GET['id'];
+  $student_id = $_GET['id'] ?? null;
 
-  $student = getStudentById($student_id);
+  // $student = getStudentById($student_id);
+  if ($student_id) {
+    $student = getStudentById($student_id);
+}
+if ($student):  // Ensure $student is not null
+
 ?>
 <div class="container mt-5 mx-auto col-md-6">
 <form action="./index.php?task=update" method="post">
   <div class="form-row">
+  <input type="hidden" name="id" value="<?php echo $student['id']; ?>"> <!-- Add hidden field for ID -->
     <div class="col">
       <input type="text" name="fname"  class="form-control" placeholder="First name" value="<?php 
       echo $student['fname'];
@@ -118,6 +125,10 @@ if('update' == $task):
 </div>
 
 <?php
+ else:
+  echo "<p class='alert alert-danger'>Student not found.</p>"; // Show an error if student is not found
+ endif;
+
 endif;
 ?>
     <!-- Bootstrap JS and dependencies (Optional) -->

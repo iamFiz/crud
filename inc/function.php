@@ -15,36 +15,26 @@ function generateReport()
             </tr>
         </thead>
         <tbody>
-            <?php
-            foreach ($students as $student) {
-            ?>
-                <tr>
-                    <td>
-                        <?php printf('%s %s', $student['fname'], $student['lname']); ?>
-                    </td>
-                    <td><?php printf('%d', $student['roll']); ?></td>
-                    <!-- <td><a href="#" >Edit</a> | <a href="#">Delete</a></td> -->
-                    <td>
-                        <?php
-                        if (isAdmin() || isEditor()):
-                        ?>
-                            <?php printf('<a href="./index.php?task=update&%d">',$student['id'])?> Edit</a>
-                        <?php
-                        endif;
-                        ?>
-                        <?php
-                            if (isAdmin()):
-                            ?>
-                            <!-- |<a href="./index.php?task=report">Delete</a> -->
-                            |<?php printf('<a href="./index.php?task=delete&%d">',$student['id'])?>Delete</a>
-                            <?php
-                            endif;
-                            ?>
-                    </td>
-                </tr>
-            <?php
-            }
-            ?>
+        <?php
+// Generate the report table and include Edit and Delete links
+foreach ($students as $student) {
+?>
+    <tr>
+        <td><?php printf('%s %s', $student['fname'], $student['lname']); ?></td>
+        <td><?php printf('%d', $student['roll']); ?></td>
+        <td>
+            <?php if (isAdmin() || isEditor()): ?>
+                <a href="./index.php?task=update&id=<?php echo $student['id']; ?>">Edit</a> <!-- Correct URL -->
+            <?php endif; ?>
+            <?php if (isAdmin()): ?>
+                | <a href="./index.php?task=delete&id=<?php echo $student['id']; ?>">Delete</a> <!-- Correct URL -->
+            <?php endif; ?>
+        </td>
+    </tr>
+<?php
+}
+?>
+
         </tbody>
     </table>
 <?php
