@@ -11,7 +11,7 @@ function generateReport(){
                     <th scope="col">Roll</th>
                     <th scope="col">Action</th>
                 </tr>
-            </thead>\
+            </thead>
             <tbody>
                 <?php
                 foreach($students as $student){
@@ -46,8 +46,12 @@ function addStudent($fname,$lname,$roll){
     $found = false;
     $serializedData = file_get_contents(DB_NAME);
     $students = unserialize($serializedData);
+    if ($students === false) {
+        $students = []; // <-- Initialize as an empty array if unserialize fails
+    }
+
     foreach($students as $_student){
-        if($_student['roll'] = $roll){
+        if($_student['roll'] == $roll){
             $found = true;
             break;
         }
@@ -70,6 +74,9 @@ function addStudent($fname,$lname,$roll){
 }
 
 function getNewId($students){
+    if (empty($students)) {
+        return 1; // <-- Return 1 if the students array is empty
+    }
     $maxId = max(array_column($students,'id'));
     return $maxId + 1;
 }
