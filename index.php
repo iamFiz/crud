@@ -1,7 +1,7 @@
 <?php
 session_start(
     [
-        'cookie_lifetime' => 150,
+        'cookie_lifetime' => 500,
     ]
 );
 require_once "./inc/function.php";
@@ -12,6 +12,15 @@ if(isset($_POST['submit'])){
   $roll = $_POST['roll'];
   addStudent($fname,$lname,$roll);
 };
+if(isset($_POST['submit']) && $task == 'update'){
+  $fname = $_POST['fname'];
+  $lname = $_POST['lname'];
+  $roll = $_POST['roll'];
+  doUpdate($id,$fname, $lname, $roll);
+  header("Location: ./index.php?task=report"); // Redirect after update
+    exit;
+}
+
 
 $task  = $_GET['task'] ?? 'report';
 
@@ -72,7 +81,39 @@ endif;
       <input type="text" name="roll"  class="form-control" placeholder="Roll">
     </div>
   </div>
-  <button type="submit" name="submit" class="btn btn-primary mt-3">Submit</button>
+  <button type="submit" name="submit" class="btn btn-primary mt-3">Save</button>
+</form>
+</div>
+
+<?php
+endif;
+?>
+<?php
+if('update' == $task):
+  $student_id = $_GET['id'];
+
+  $student = getStudentById($student_id);
+?>
+<div class="container mt-5 mx-auto col-md-6">
+<form action="./index.php?task=update" method="post">
+  <div class="form-row">
+    <div class="col">
+      <input type="text" name="fname"  class="form-control" placeholder="First name" value="<?php 
+      echo $student['fname'];
+      ?>">
+    </div>
+    <div class="col">
+      <input type="text" name="lname"  class="form-control" placeholder="Last name" value="<?php 
+      echo $student['lname'];
+      ?>">
+    </div>
+    <div class="col">
+      <input type="text" name="roll"  class="form-control" placeholder="Roll" value="<?php 
+      echo $student['roll'];
+      ?>">
+    </div>
+  </div>
+  <button type="submit" name="submit" class="btn btn-primary mt-3">Update</button>
 </form>
 </div>
 

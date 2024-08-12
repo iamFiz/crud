@@ -2,7 +2,7 @@
 // Start the session with a cookie lifetime of 300 seconds (5 minutes)
 session_start(
     [
-        'cookie_lifetime' => 150,
+        'cookie_lifetime' => 500,
     ]
 );
 $error = false;

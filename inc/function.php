@@ -1,48 +1,69 @@
 <?php
-define('DB_NAME','data/db.txt');
-function generateReport(){
+define('DB_NAME', 'data/db.txt');
+function generateReport()
+{
     $serializedData = file_get_contents(DB_NAME);
     $students = unserialize($serializedData);
-    ?>
-        <table class="table table-striped mt-3">
-            <thead>
+?>
+    <table class="table table-striped mt-3">
+        <thead>
+            
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Roll</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            foreach ($students as $student) {
+            ?>
                 <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Roll</th>
-                    <th scope="col">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                foreach($students as $student){
-                ?>
-                 <tr>
                     <td>
-                        <?php printf('%s %s',$student['fname'], $student['lname']);?>
+                        <?php printf('%s %s', $student['fname'], $student['lname']); ?>
                     </td>
-                    <td><?php printf('%d',$student['roll']);?></td>
-                    <td><a href="#">Edit</a> | <a href="#">Delete</a></td>
+                    <td><?php printf('%d', $student['roll']); ?></td>
+                    <!-- <td><a href="#" >Edit</a> | <a href="#">Delete</a></td> -->
+                    <td>
+                        <?php
+                        if (isAdmin() || isEditor()):
+                        ?>
+                            <?php printf('<a href="./index.php?task=update&%d">',$student['id'])?> Edit</a>
+                        <?php
+                        endif;
+                        ?>
+                        <?php
+                            if (isAdmin()):
+                            ?>
+                            <!-- |<a href="./index.php?task=report">Delete</a> -->
+                            |<?php printf('<a href="./index.php?task=delete&%d">',$student['id'])?>Delete</a>
+                            <?php
+                            endif;
+                            ?>
+                    </td>
                 </tr>
-                <?php
-                }
-                ?>
-            </tbody>
-        </table>
-        <?php
+            <?php
+            }
+            ?>
+        </tbody>
+    </table>
+<?php
 }
 ?>
 <?php
 
 
-function isAdmin(){
+function isAdmin()
+{
     return ('admin' == $_SESSION['role']);
 }
 
-function isEditor(){
+function isEditor()
+{
     return ('editor' == $_SESSION['role']);
-
 }
-function addStudent($fname,$lname,$roll){
+function addStudent($fname, $lname, $roll)
+{
     $found = false;
     $serializedData = file_get_contents(DB_NAME);
     $students = unserialize($serializedData);
@@ -50,13 +71,13 @@ function addStudent($fname,$lname,$roll){
         $students = []; // <-- Initialize as an empty array if unserialize fails
     }
 
-    foreach($students as $_student){
-        if($_student['roll'] == $roll){
+    foreach ($students as $_student) {
+        if ($_student['roll'] == $roll) {
             $found = true;
             break;
         }
     }
-    if(!$found){
+    if (!$found) {
         $newID = getNewId($students);
         $student = array(
             'id' => $newID,
@@ -64,21 +85,50 @@ function addStudent($fname,$lname,$roll){
             'lname' => $lname,
             'roll' => $roll
         );
-        array_push($students,$student);
+        array_push($students, $student);
         $serializedData = serialize($students);
-        file_put_contents(DB_NAME, $serializedData , LOCK_EX);
+        file_put_contents(DB_NAME, $serializedData, LOCK_EX);
         return true;
     }
-    return true ;
+    return true;
+}
+
+function doUpdate($id,$fname, $lname, $roll){
+    $found = false;
+    // define('DB_NAME',"data/db.txt");
+    $serialiezed = file_get_contents(DB_NAME);
+    $students = unserialize($serialiezed);
+    foreach($students as $student){
+        if($student['id'] == $id){
+            $student['fname'] = $fname;
+            $student['lname'] = $lname;
+            $student['roll'] = $roll;
+            break;
+        }
+    }
+    $serializedData = serialize($students);
+    file_put_contents(DB_NAME, $serializedData, LOCK_EX); // Save the updated data back to the file
 
 }
 
-function getNewId($students){
+function getNewId($students)
+{
     if (empty($students)) {
         return 1; // <-- Return 1 if the students array is empty
     }
-    $maxId = max(array_column($students,'id'));
+    $maxId = max(array_column($students, 'id'));
     return $maxId + 1;
+}
+
+function getStudentById($id){
+    $serialiezed = file_get_contents(DB_NAME);
+    $students = unserialize($serialiezed);
+    foreach ($students as $student){
+        if($student['id'] == $id){
+            return $student;
+        }
+    }
+    return null;
 }
 
 ?>
