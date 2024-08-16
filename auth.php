@@ -1,10 +1,11 @@
 <?php
 // Start the session with a cookie lifetime of 300 seconds (5 minutes)
-session_start(
-    [
-        'cookie_lifetime' => 500,
-    ]
-);
+// session_start(
+//     [
+//         'cookie_lifetime' => 500,
+//     ]
+// );
+session_start();
 $error = false;
 // session_destroy();
 // Initialize 'loggedin' key in the session if it's not already set

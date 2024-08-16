@@ -4,10 +4,10 @@ function generateReport()
 {
     $serializedData = file_get_contents(DB_NAME);
     $students = unserialize($serializedData);
-?>
+    ?>
     <table class="table table-striped mt-3">
         <thead>
-            
+
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Roll</th>
@@ -17,23 +17,30 @@ function generateReport()
         <tbody>
         <?php
 // Generate the report table and include Edit and Delete links
-foreach ($students as $student) {
-?>
+    foreach ($students as $student) {
+        ?>
     <tr>
-        <td><?php printf('%s %s', $student['fname'], $student['lname']); ?></td>
-        <td><?php printf('%d', $student['roll']); ?></td>
+        <td><?php printf('%s %s', $student['fname'], $student['lname']);?></td>
+        <td><?php printf('%d', $student['roll']);?></td>
         <td>
             <?php if (isAdmin() || isEditor()): ?>
                 <a href="./index.php?task=update&id=<?php echo $student['id']; ?>">Edit</a> <!-- Correct URL -->
-            <?php endif; ?>
+            <?php endif;?>
             <?php if (isAdmin()): ?>
-                | <a href="./index.php?task=delete&id=<?php echo $student['id']; ?>">Delete</a> <!-- Correct URL -->
-            <?php endif; ?>
+                | 
+                <!-- <a href="./index.php?task=delete&id= -->
+                
+
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#deleteModal" data-id="<?php echo $student['id']; ?>">
+                    Delete
+                </button>
+                 <!-- Correct URL -->
+            <?php endif;?>
         </td>
     </tr>
 <?php
 }
-?>
+    ?>
 
         </tbody>
     </table>
@@ -41,7 +48,6 @@ foreach ($students as $student) {
 }
 ?>
 <?php
-
 
 function isAdmin()
 {
@@ -73,7 +79,7 @@ function addStudent($fname, $lname, $roll)
             'id' => $newID,
             'fname' => $fname,
             'lname' => $lname,
-            'roll' => $roll
+            'roll' => $roll,
         );
         array_push($students, $student);
         $serializedData = serialize($students);
@@ -83,18 +89,20 @@ function addStudent($fname, $lname, $roll)
     return true;
 }
 
-function doUpdate($id,$fname, $lname, $roll){
+function doUpdate($id, $fname, $lname, $roll)
+{
     $found = false;
     // define('DB_NAME',"data/db.txt");
     $serialiezed = file_get_contents(DB_NAME);
     $students = unserialize($serialiezed);
-    foreach($students as $student){
-        if($student['id'] == $id){
+    foreach ($students as &$student) {
+        if ($student['id'] == $id) {
             $student['fname'] = $fname;
             $student['lname'] = $lname;
             $student['roll'] = $roll;
             break;
         }
+        break;
     }
     $serializedData = serialize($students);
     file_put_contents(DB_NAME, $serializedData, LOCK_EX); // Save the updated data back to the file
@@ -110,11 +118,12 @@ function getNewId($students)
     return $maxId + 1;
 }
 
-function getStudentById($id){
+function getStudentById($id)
+{
     $serialiezed = file_get_contents(DB_NAME);
     $students = unserialize($serialiezed);
-    foreach ($students as $student){
-        if($student['id'] == $id){
+    foreach ($students as $student) {
+        if ($student['id'] == $id) {
             return $student;
         }
     }

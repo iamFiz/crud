@@ -1,10 +1,12 @@
 <?php
-session_start(
-    [
-        'cookie_lifetime' => 500,
-    ]
-);
+// session_start(
+//     [
+//         'cookie_lifetime' => 500,
+//     ]
+// );
+session_start();
 require_once "./inc/function.php";
+$task  = $_GET['task'] ?? 'report';
 
 if(isset($_POST['submit'])){
   $fname = $_POST['fname'];
@@ -12,18 +14,19 @@ if(isset($_POST['submit'])){
   $roll = $_POST['roll'];
   addStudent($fname,$lname,$roll);
 };
-if(isset($_POST['submit']) && $task == 'update'){
+if(isset($_POST['submit']) && 'update' == $task){
   $id = $_POST['id'];
   $fname = $_POST['fname'];
   $lname = $_POST['lname'];
   $roll = $_POST['roll'];
   doUpdate($id,$fname, $lname, $roll);
   header("Location: ./index.php?task=report"); // Redirect after update
+    // exit;
+    header('location:././index.php');
     exit;
 }
 
 
-$task  = $_GET['task'] ?? 'report';
 
 
 
@@ -91,7 +94,8 @@ endif;
 ?>
 <?php
 if('update' == $task):
-  $student_id = $_GET['id'] ?? null;
+  // $student_id = $_GET['id'] ?? null;
+  $student_id = $_GET['id'];
 
   // $student = getStudentById($student_id);
   if ($student_id) {
@@ -131,10 +135,63 @@ if ($student):  // Ensure $student is not null
 
 endif;
 ?>
+<?php
+if('delete' == $task ):
+?>
+   <!-- modal start  -->
+    <!-- Button trigger modal -->
+<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+  Launch demo modal
+</button> -->
+
+<!-- Modal -->
+<!-- Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Are you sure?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Do you really want to delete this student?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+        <!-- 'Yes' button will trigger the deletion -->
+        <button type="button" class="btn btn-primary" id="confirmDelete">Yes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+   <!-- modal end here  -->
+<?php
+endif;
+?>
     <!-- Bootstrap JS and dependencies (Optional) -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+  $('#deleteModal').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget); // Button that triggered the modal
+      var studentId = button.data('id'); // Extract student ID from data-* attribute
+      
+      // Update the modal's content if needed
+      var modal = $(this);
+      modal.find('.modal-body').text('Are you sure you want to delete student with ID ' + studentId + '?');
+      
+      // Handle the confirmation
+      $('#confirmDelete').off('click').on('click', function () {
+          window.location.href = './index.php?task=delete&id=' + studentId;
+      });
+  });
+</script>
+
 </body>
 
 </html>
